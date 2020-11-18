@@ -69,6 +69,7 @@ task SamToFastqAndBwaMemAndMba {
         INTERLEAVE=true \
         NON_PF=true | \
       /usr/gitc/~{bwa_commandline} /dev/stdin - 2> >(tee ~{output_bam_basename}.bwa.stderr.log >&2) | \
+      /usr/gitc/k8 /usr/gitc/bwa-postalt.js ~{reference_fasta.ref_alt} /dev/stdin | \
       java -Dsamjdk.compression_level=~{compression_level} -Xms1000m -Xmx1000m -jar /usr/gitc/picard.jar \
         MergeBamAlignment \
         VALIDATION_STRINGENCY=SILENT \
@@ -109,7 +110,7 @@ task SamToFastqAndBwaMemAndMba {
     fi
   >>>
   runtime {
-    docker: "us.gcr.io/broad-gotc-prod/genomes-in-the-cloud:2.4.3-1564508330" # TODO: update docker to use the new Picard options
+    docker: "michaelgatzen/altaware_bwa:latest" # TODO: update docker to use the new Picard options
     preemptible: preemptible_tries
     memory: "14 GiB"
     cpu: "16"
